@@ -29,7 +29,6 @@
     <div class="form-group">
       <label>Cost</label>
       <input type="text" name="cost" class="form-control" value="{{ old('cost', $order->cost) }}">
-
     </div>
   </div>
 </div>

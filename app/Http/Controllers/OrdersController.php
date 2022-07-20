@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Contract;
+
 use Illuminate\Http\Request;
 
 class OrdersController extends Controller
@@ -35,7 +37,21 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
+        // Valida i dati del form 
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'title' => 'required|max:100',
+            'cost' => 'required|numeric|between:1, 999.99',
+        ]); 
+
         $order = Order::create($request->all());
+
+        // Crea un nuovo contratto
+        $contract = new Contract();
+        // Asssocio il nuovo contratto all'ordine creato
+        $contract->customer_id = $order->customer_id;
+        $contract->order_id = $order->id;
+        $contract->save();
 
         return redirect()->route('orders.edit', $order)->withMessage('Order created successfully.');
     }
@@ -74,6 +90,10 @@ class OrdersController extends Controller
     public function destroy(Order $order)
     {
         $order->delete();
+
+        // Elimina il contratto associato
+        $contract = Contract::where('order_id', $order->id);
+        $contract->delete();
 
         return redirect()->route('orders.index')->withMessage('Order deleted successfully');
     }
