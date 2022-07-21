@@ -89,11 +89,11 @@ class OrdersController extends Controller
      */
     public function destroy(Order $order)
     {
-        $order->delete();
 
-        // Elimina il contratto associato
-        $contract = Contract::where('order_id', $order->id);
-        $contract->delete();
+        // Azzera tutte le relazioni
+        $order->contract()->delete();
+  
+        $order->delete();
 
         return redirect()->route('orders.index')->withMessage('Order deleted successfully');
     }

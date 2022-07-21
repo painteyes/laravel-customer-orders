@@ -11,4 +11,9 @@ class Contract extends Model
 {
     use SoftDeletes;
 
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
 }

@@ -16,10 +16,8 @@ class CreateContractsTable extends Migration
         Schema::create('contracts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('customer_id');
-            $table->unsignedBigInteger('order_id');
             $table->timestamps();
             $table->softDeletes();
-
         });
     }
 

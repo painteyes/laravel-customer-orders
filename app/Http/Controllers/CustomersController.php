@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Contract;
+
 use Illuminate\Http\Request;
 
 class CustomersController extends Controller
@@ -73,6 +76,13 @@ class CustomersController extends Controller
      */
     public function destroy(Customer $customer)
     {
+
+        // Azzera tutte le relazioni
+        foreach ($customer->orders as $order) {
+            $order->contract()->delete();
+            $order->delete();
+        }
+
         $customer->delete();
 
         return redirect()->route('customers.index')->withMessage('Customer deleted successfully');

@@ -17,4 +17,9 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function contract()
+    {
+        return $this->hasOne(Contract::class);
+    }
 }

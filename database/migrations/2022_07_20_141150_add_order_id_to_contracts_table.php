@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrdersTable extends Migration
+class AddOrderIdToContractsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->text('title');
-            $table->text('description');
-            $table->double('cost', 8, 2);
-            $table->timestamps();
-            $table->softDeletes();
+        Schema::table('contracts', function (Blueprint $table) {
+            $table->unsignedBigInteger('order_id');
+            $table->foreign('order_id')
+            ->references('id')
+            ->on('orders');
 
         });
     }
@@ -31,6 +29,7 @@ class CreateOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orders');
+        $table->dropForeign('contracts_order_id_foreign');
+        $table->dropColumn('order_id');
     }
 }

@@ -16,9 +16,13 @@
       <tbody>
         @foreach($contracts as $contract)
           <tr>
-            <th scope="row">{{ $contract->id }}</th>
-            <td>{{ $contract->customer_id }}</td>
-            <td>{{ $contract->order_id }}</td>
+            <th scope="row"></th>
+            <td>
+              <a class="nav-link" href="{{ route('customers.edit', $contract->customer_id) }}">{{ $contract->customer_id }}</a>
+            </td>
+            <td>
+              <a class="nav-link" href="{{ route('orders.edit', $contract->order_id) }}">{{ $contract->order_id }}</a>
+            </td>
             <td>{{ $contract->created_at }}</td>
           </tr>
         @endforeach
