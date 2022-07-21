@@ -22,4 +22,9 @@ class Order extends Model
     {
         return $this->hasOne(Contract::class);
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
 }

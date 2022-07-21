@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Contract;
+use App\Models\Tag;
+
 
 use Illuminate\Http\Request;
 
@@ -26,7 +28,9 @@ class OrdersController extends Controller
      */
     public function create()
     {
-        return view('orders.create')->withOrder(new Order);
+        $tags = Tag::all();
+
+        return view('orders.create', compact('tags'))->withOrder(new Order);
     }
 
     /**
@@ -42,6 +46,7 @@ class OrdersController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'title' => 'required|max:100',
             'cost' => 'required|numeric|between:1, 999.99',
+            'tags' => 'exists:tags,id'
         ]); 
 
         $order = Order::create($request->all());
@@ -52,6 +57,10 @@ class OrdersController extends Controller
         $contract->customer_id = $order->customer_id;
         $contract->order_id = $order->id;
         $contract->save();
+
+        // Associo i tags all'ordine
+        $sync_data = $request->tags;
+        $order->tags()->sync($sync_data);
 
         return redirect()->route('orders.edit', $order)->withMessage('Order created successfully.');
     }
@@ -64,7 +73,9 @@ class OrdersController extends Controller
      */
     public function edit(Order $order)
     {
-        return view('orders.edit', compact('order'));
+        $tags = Tag::all();
+
+        return view('orders.edit', compact('order', 'tags'));
     }
 
     /**
@@ -76,9 +87,23 @@ class OrdersController extends Controller
      */
     public function update(Request $request, Order $order)
     {
+        // Valida i dati del form 
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'title' => 'required|max:100',
+            'cost' => 'required|numeric|between:1, 999.99',
+            'tags' => 'exists:tags,id'
+        ]);
+
         $order->update($request->all());
 
-        return view('orders.edit', compact('order'))->withMessage('Order updated successfully.');
+        // Aggiorna le relazioni
+        $sync_data = $request->tags;
+        $order->tags()->sync($sync_data);
+        
+        $tags = Tag::all();
+
+        return view('orders.edit', compact('order', 'tags'))->withMessage('Order updated successfully.');
     }
 
     /**
@@ -92,7 +117,8 @@ class OrdersController extends Controller
 
         // Azzera tutte le relazioni
         $order->contract()->delete();
-  
+        $order->tags()->sync([]);
+
         $order->delete();
 
         return redirect()->route('orders.index')->withMessage('Order deleted successfully');

@@ -13,6 +13,7 @@
 
   <form action="{{ route('orders.store') }}" method="POST">
     @csrf
+    @method('POST')
     @include('orders._form')
     <button type="submit" class="btn btn-primary">Save</button>
   </form>
