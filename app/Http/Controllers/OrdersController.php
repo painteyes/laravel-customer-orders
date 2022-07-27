@@ -41,7 +41,7 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        // Valida i dati del form 
+        // Validate form
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'title' => 'required|max:100',
@@ -51,16 +51,8 @@ class OrdersController extends Controller
 
         $order = Order::create($request->all());
 
-        // Crea un nuovo contratto
-        $contract = new Contract();
-        // Asssocio il nuovo contratto all'ordine creato
-        $contract->customer_id = $order->customer_id;
-        $contract->order_id = $order->id;
-        $contract->save();
-
-        // Associo i tags all'ordine
-        $sync_data = $request->tags;
-        $order->tags()->sync($sync_data);
+        // Associate the tags with the order
+        $order->tags()->sync($request->tags);
 
         return redirect()->route('orders.edit', $order)->withMessage('Order created successfully.');
     }
@@ -87,7 +79,7 @@ class OrdersController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        // Valida i dati del form 
+        // Validate form
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'title' => 'required|max:100',
@@ -97,9 +89,8 @@ class OrdersController extends Controller
 
         $order->update($request->all());
 
-        // Aggiorna le relazioni
-        $sync_data = $request->tags;
-        $order->tags()->sync($sync_data);
+        // Update the relations
+        $order->tags()->sync($request->tags);
         
         $tags = Tag::all();
 
@@ -114,11 +105,6 @@ class OrdersController extends Controller
      */
     public function destroy(Order $order)
     {
-
-        // Azzera tutte le relazioni
-        $order->contract()->delete();
-        $order->tags()->sync([]);
-
         $order->delete();
 
         return redirect()->route('orders.index')->withMessage('Order deleted successfully');

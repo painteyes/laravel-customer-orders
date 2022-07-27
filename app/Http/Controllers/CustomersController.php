@@ -39,7 +39,6 @@ class CustomersController extends Controller
     public function store(Request $request)
     {
         $customer = Customer::create($request->all());
-
         return redirect()->route('customers.edit', $customer)->withMessage('Customer created successfully.');
     }
 
@@ -64,7 +63,6 @@ class CustomersController extends Controller
     public function update(Request $request, Customer $customer)
     {
         $customer->update($request->all());
-
         return view('customers.edit', compact('customer'))->withMessage('Customer updated successfully.');
     }
 
@@ -76,15 +74,7 @@ class CustomersController extends Controller
      */
     public function destroy(Customer $customer)
     {
-
-        // Azzera tutte le relazioni
-        foreach ($customer->orders as $order) {
-            $order->contract()->delete();
-            $order->delete();
-        }
-
         $customer->delete();
-
         return redirect()->route('customers.index')->withMessage('Customer deleted successfully');
     }
 }
